@@ -1,5 +1,4 @@
 """ Service for sending and retrieving messages """
-import json
 from flask import Flask, jsonify, request
 from redis import Redis
 from marshmallow import Schema, fields, ValidationError
