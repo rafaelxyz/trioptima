@@ -11,11 +11,10 @@ curl -w "\n" -d '{"user": "user1"}' -H "Content-Type: application/json" -X GET h
 curl -w "\n" -d '{"user": "user1"}' -H "Content-Type: application/json" -X DELETE http://localhost:5000/
 curl -w "\n" -d '{"user": "user1"}' -H "Content-Type: application/json" -X GET http://localhost:5000/
 
+# delete several messages at in one call
 curl -w "\n" -d '{"user": "user2", "message": "hi1"}' -H "Content-Type: application/json" -X POST http://localhost:5000/
 curl -w "\n" -d '{"user": "user2", "message": "hi2"}' -H "Content-Type: application/json" -X POST http://localhost:5000/
 
-
-# delete several messages at in one call
 curl -w "\n" -d '{"user": "user2"}' -H "Content-Type: application/json" -X GET http://localhost:5000/
 curl -w "\n" -d '{"user": "user2", "count": 2}' -H "Content-Type: application/json" -X DELETE http://localhost:5000/
 curl -w "\n" -d '{"user": "user2"}' -H "Content-Type: application/json" -X GET http://localhost:5000/
