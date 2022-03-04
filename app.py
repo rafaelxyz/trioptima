@@ -1,32 +1,36 @@
+""" Service for sending and retrieving messages """
 import json
 from flask import Flask, jsonify, request
 from redis import Redis
 from marshmallow import Schema, fields, ValidationError
 
+flask = Flask(__name__)
+redis = Redis(host='redis', port=6379, charset="utf-8", decode_responses=True)
+
 class PostSchema(Schema):
+    """ Verify incoming json data """
     user = fields.String(required=True)
     message = fields.String(required=True)
 
 class GetSchema(Schema):
+    """ Verify incoming json data """
     user = fields.String(required=True)
 
 class DeleteSchema(Schema):
+    """ Verify incoming json data """
     user = fields.String(required=True)
-    count = fields.String(required=False)
-
-flask = Flask(__name__)
-redis = Redis(host='redis', port=6379, charset="utf-8", decode_responses=True)
-
+    count = fields.Integer(required=False)
 
 
 @flask.route('/', methods=['POST'])
 def send_message():
+    """ . """
     data = request.get_json()
     schema = PostSchema()
     try:
-        result = schema.load(data)
+        schema.load(data)
     except ValidationError as err:
-        return jsonify(err.message), 400
+        return jsonify(err.messages), 400
 
     user = data['user']
     msg = data['message']
@@ -36,12 +40,13 @@ def send_message():
 
 @flask.route('/', methods=['GET'])
 def get_messages():
+    """ . """
     data = request.get_json()
     schema = GetSchema()
     try:
-        result = schema.load(data)
+        schema.load(data)
     except ValidationError as err:
-        return jsonify(err.message), 400
+        return jsonify(err.messages), 400
 
     user = data['user']
     messages = redis.lrange(user + ':message', 0, -1)
@@ -49,12 +54,13 @@ def get_messages():
 
 @flask.route('/unread', methods=['GET'])
 def get_unread():
+    """ . """
     data = request.get_json()
     schema = GetSchema()
     try:
-        result = schema.load(data)
+        schema.load(data)
     except ValidationError as err:
-        return jsonify(err.message), 400
+        return jsonify(err.messages), 400
 
     user = data['user']
     result = []
@@ -67,12 +73,13 @@ def get_unread():
 
 @flask.route('/', methods=['DELETE'])
 def delete_messages():
+    """ . """
     data = request.get_json()
     schema = DeleteSchema()
     try:
-        result = schema.load(data)
+        schema.load(data)
     except ValidationError as err:
-        return jsonify(err.message), 400
+        return jsonify(err.messages), 400
 
     user = data['user']
     count = 1
