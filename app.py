@@ -24,7 +24,7 @@ class DeleteSchema(Schema):
 
 @flask.route('/', methods=['POST'])
 def send_message():
-    """ . """
+    """ Store incoming messages """
     data = request.get_json()
     schema = PostSchema()
     try:
@@ -40,7 +40,7 @@ def send_message():
 
 @flask.route('/', methods=['GET'])
 def get_messages():
-    """ . """
+    """ Return all messages for a user, even read messages """
     data = request.get_json()
     schema = GetSchema()
     try:
@@ -54,7 +54,7 @@ def get_messages():
 
 @flask.route('/unread', methods=['GET'])
 def get_unread():
-    """ . """
+    """ Return all unread messages """
     data = request.get_json()
     schema = GetSchema()
     try:
@@ -73,7 +73,7 @@ def get_unread():
 
 @flask.route('/', methods=['DELETE'])
 def delete_messages():
-    """ . """
+    """ Delete messages, oldest first. Optional count """
     data = request.get_json()
     schema = DeleteSchema()
     try:
