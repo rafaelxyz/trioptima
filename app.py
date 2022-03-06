@@ -4,7 +4,7 @@ from redis import Redis
 from marshmallow import Schema, fields, ValidationError
 
 flask = Flask(__name__)
-redis = Redis(host='redis', port=6379, charset="utf-8", decode_responses=True)
+redis = Redis(host='redis', port=6379, charset='utf-8', decode_responses=True)
 
 class PostSchema(Schema):
     """ Verify incoming json data """
@@ -22,8 +22,10 @@ class DeleteSchema(Schema):
 
 
 @flask.route('/', methods=['POST'])
-def send_message():
-    """ Store incoming messages """
+def post_message():
+    """ Store incoming messages and the status of those messages. Stored in
+        separate ordered lists. """
+
     data = request.get_json()
     schema = PostSchema()
     try:
@@ -35,7 +37,8 @@ def send_message():
     msg = data['message']
     redis.lpush(user + ':message', msg)
     redis.lpush(user + ':unread', 'true')
-    return 'Adding message, user: {}, message: {}'.format(user, msg)
+    log_size(user)
+    return 'Adding message, user: {}, message: {}'.format(user, msg), 201
 
 @flask.route('/', methods=['GET'])
 def get_messages():
@@ -52,7 +55,7 @@ def get_messages():
     return 'Get messeges, user: {}, messages: {}'.format(user, messages)
 
 @flask.route('/unread', methods=['GET'])
-def get_unread():
+def get_unread_messages():
     """ Return all unread messages """
     data = request.get_json()
     schema = GetSchema()
@@ -86,7 +89,16 @@ def delete_messages():
         count = data['count']
     redis.rpop(user + ':message', count)
     redis.rpop(user + ':unread', count)
+    log_size(user)
     return 'Deleted messages, user: {}, number of deleted messages: {}'.format(user, count)
+
+
+def log_size(user):
+    msg_length = redis.llen(user + ':message')
+    unread_length = redis.llen(user + ':unread')
+    flask.logger.info('message length:{}'.format(msg_length))
+    flask.logger.info('unread length:{}'.format(unread_length))
 
 if __name__ == "__main__":
     flask.run(host="0.0.0.0", debug=True)
+
